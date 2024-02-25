@@ -3,17 +3,16 @@ import { useSyncExternalStore } from 'react';
 
 type UpdateFunction<T> = (state: T) => T;
 type Updater<T> = (cb: UpdateFunction<T>) => void;
-type StoreBuilder<T> = {
-  defaultState: T;
-  useStore: () => [T, Updater<T>];
-};
+interface StoreBuilder<T> {
+  defaultState: T
+  useStore: () => [T, Updater<T>]
+}
 
 const createStore = <T>(initialState: T) => {
-  console.log(initialState);
   let storeInstance: BehaviorSubject<T> | null = null;
 
   return () => {
-    if (!storeInstance) {
+    if (storeInstance === null) {
       storeInstance = new BehaviorSubject<T>(initialState);
     }
     return storeInstance;
@@ -28,8 +27,10 @@ export const buildStore = <T>(defaultState: T): StoreBuilder<T> => {
 
     const subscribe = (onStoreChange: () => void) => {
       const subscription = store.subscribe({
-        next: () => onStoreChange(),
-        error: console.log,
+        next: () => {
+          onStoreChange();
+        },
+        error: console.log
       });
 
       return () => {
@@ -45,6 +46,6 @@ export const buildStore = <T>(defaultState: T): StoreBuilder<T> => {
   };
   return {
     defaultState,
-    useStore,
+    useStore
   };
 };

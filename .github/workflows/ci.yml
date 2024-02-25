@@ -13,10 +13,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
+      - name: Cache Dependencies (Yarn Berry)
+        uses: actions/cache@v3
+        with:
+          path: ~/.yarn/cache # Cache location for Yarn Berry
+          key: ${{ runner.os }}-yarn-berry-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-
 
       - name: Install Dependencies
         run: yarn install --immutable
@@ -33,8 +41,12 @@ jobs:
       - name: Run Tests
         run: yarn test
 
+      - name: Start Storybook
+        run: yarn storybook &
+
       - name: Run Playwright tests
         run: yarn playwright test
+
       - uses: actions/upload-artifact@v3
         if: always()
         with:

@@ -3,7 +3,11 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['standard-with-typescript', 'plugin:react/recommended', 'plugin:storybook/recommended'],
+  extends: [
+    'standard-with-typescript',
+    'plugin:react/recommended',
+    'plugin:storybook/recommended',
+  ],
   overrides: [],
   parserOptions: {
     ecmaVersion: 'latest',
@@ -12,6 +16,7 @@ module.exports = {
   plugins: ['react'],
   rules: {
     '@typescript-eslint/semi': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
   },
   settings: {
     react: {

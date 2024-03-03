@@ -3,6 +3,6 @@ import * as publicApi from '../index';
 
 describe('Public api', () => {
   it('Should have a test export', () => {
-    expect(publicApi.test).toBeDefined();
+    expect(publicApi.buildStore).toBeDefined();
   });
 });

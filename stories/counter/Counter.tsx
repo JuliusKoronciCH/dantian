@@ -1,6 +1,12 @@
 import React from 'react';
 import { Flex, Text, Button } from '@radix-ui/themes';
-import useStore from './counterStore';
+import useStore, { useCounterSelector } from './counterStore';
+
+const CountText = () => {
+  const count = useCounterSelector((state) => state.count);
+
+  return <Text>We are counting first: {count}</Text>;
+};
 
 export const Counter = () => {
   const [state, updateCount] = useStore();
@@ -9,7 +15,7 @@ export const Counter = () => {
 
   return (
     <Flex direction="column" gap="2">
-      <Text>We are counting first: {state.count}</Text>
+      <CountText />
       <Button onClick={increment}>Let's go, first counter</Button>
     </Flex>
   );

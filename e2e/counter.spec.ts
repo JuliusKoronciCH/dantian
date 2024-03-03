@@ -21,10 +21,14 @@ test('test counter with classic store', async ({ page }) => {
   const counter3Text = getStorybookLocator(page).locator(
     'text=We are counting third: 0',
   );
+  const counterPromiseText = getStorybookLocator(page).locator(
+    'text=We are counting hydrating default: 88',
+  );
 
   await expect(counter1Text).toBeVisible();
   await expect(counter2Text).toBeVisible();
   await expect(counter3Text).toBeVisible();
+  await expect(counterPromiseText).toBeVisible();
 
   const button3 = getStorybookLocator(page).locator(
     'button:has-text("Let\'s go, third counter, reusing second store")',
@@ -67,5 +71,15 @@ test('test counter with classic store', async ({ page }) => {
   ).toBeVisible();
   await expect(
     getStorybookLocator(page).locator('text=We are counting second: 2'),
+  ).toBeVisible();
+
+  const buttonPromise = getStorybookLocator(page).locator(
+    'button:has-text("Let\'s go, promise counter")',
+  );
+  await buttonPromise.click();
+  await expect(
+    getStorybookLocator(page).locator(
+      'text=We are counting hydrating default: 89',
+    ),
   ).toBeVisible();
 });

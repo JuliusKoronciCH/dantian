@@ -1,1 +1,1 @@
-export * from './store';
+export * from './classic-store';

@@ -1,10 +1,10 @@
-import { buildStore } from '../../lib';
+import { buildClassicStore } from '../../lib';
 
 export interface CounterState {
   count: number;
 }
 
-const counterStoreBuilder = buildStore<CounterState>({ count: 0 });
+const counterStoreBuilder = await buildClassicStore<CounterState>({ count: 0 });
 const { useStore, useSelector: useCounterSelector } = counterStoreBuilder;
 
 export { useCounterSelector };

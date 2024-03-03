@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Counter } from './counter/Counter';
+import { Root } from './counter/Root';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
   title: 'Dantian/Counter',
-  component: Counter,
+  component: Root,
   parameters: {
     layout: 'centered',
   },
@@ -12,7 +12,7 @@ const meta = {
   tags: ['autodocs'],
 
   argTypes: {},
-} satisfies Meta<typeof Counter>;
+} satisfies Meta<typeof Root>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

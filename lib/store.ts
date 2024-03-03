@@ -4,8 +4,8 @@ import { useSyncExternalStore } from 'react';
 type UpdateFunction<T> = (state: T) => T;
 type Updater<T> = (cb: UpdateFunction<T>) => void;
 interface StoreBuilder<T> {
-  defaultState: T
-  useStore: () => [T, Updater<T>]
+  defaultState: T;
+  useStore: () => [T, Updater<T>];
 }
 
 const createStore = <T>(initialState: T) => {
@@ -30,7 +30,7 @@ export const buildStore = <T>(defaultState: T): StoreBuilder<T> => {
         next: () => {
           onStoreChange();
         },
-        error: console.log
+        error: console.log,
       });
 
       return () => {
@@ -46,6 +46,6 @@ export const buildStore = <T>(defaultState: T): StoreBuilder<T> => {
   };
   return {
     defaultState,
-    useStore
+    useStore,
   };
 };

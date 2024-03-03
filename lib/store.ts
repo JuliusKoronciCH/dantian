@@ -1,11 +1,12 @@
 import { BehaviorSubject } from 'rxjs';
-import { useSyncExternalStore } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 
 type UpdateFunction<T> = (state: T) => T;
 type Updater<T> = (cb: UpdateFunction<T>) => void;
 interface StoreBuilder<T> {
-  defaultState: T
-  useStore: () => [T, Updater<T>]
+  defaultState: T;
+  useStore: () => [T, Updater<T>];
+  useSelector: <S>(selector: (state: T) => S) => S;
 }
 
 const createStore = <T>(initialState: T) => {
@@ -30,7 +31,7 @@ export const buildStore = <T>(defaultState: T): StoreBuilder<T> => {
         next: () => {
           onStoreChange();
         },
-        error: console.log
+        error: console.log,
       });
 
       return () => {
@@ -44,8 +45,17 @@ export const buildStore = <T>(defaultState: T): StoreBuilder<T> => {
 
     return [state, update] satisfies [T, Updater<T>];
   };
+
+  const useSelector = <S>(selector: (state: T) => S) => {
+    const [value] = useStore();
+
+    const selectedValue = selector(value);
+
+    return useMemo(() => selectedValue, [selectedValue]);
+  };
   return {
     defaultState,
-    useStore
+    useStore,
+    useSelector,
   };
 };

@@ -4,9 +4,9 @@ import { useMemo, useSyncExternalStore } from 'react';
 type UpdateFunction<T> = (state: T) => T;
 type Updater<T> = (cb: UpdateFunction<T>) => void;
 interface StoreBuilder<T> {
-  defaultState: T;
-  useStore: () => [T, Updater<T>];
-  useSelector: <S>(selector: (state: T) => S) => S;
+  defaultState: T
+  useStore: () => [T, Updater<T>]
+  useSelector: <S>(selector: (state: T) => S) => S
 }
 
 const createStore = <T>(initialState: T) => {
@@ -28,10 +28,8 @@ export const buildStore = <T>(defaultState: T): StoreBuilder<T> => {
 
     const subscribe = (onStoreChange: () => void) => {
       const subscription = store.subscribe({
-        next: () => {
-          onStoreChange();
-        },
-        error: console.log,
+        next: onStoreChange,
+        error: console.error
       });
 
       return () => {
@@ -56,6 +54,6 @@ export const buildStore = <T>(defaultState: T): StoreBuilder<T> => {
   return {
     defaultState,
     useStore,
-    useSelector,
+    useSelector
   };
 };

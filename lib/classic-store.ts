@@ -7,33 +7,22 @@ type Updater<T> = (cb: UpdateFunction<T>) => void;
 type DefaultState<T> =
   | T
   | {
-    hydrator: () => Promise<T>
-    beforeLoadState: T
-    persist?: (state: T) => Promise<void>
-  };
+      hydrator: () => Promise<T>;
+      beforeLoadState: T;
+      persist?: (state: T) => Promise<void>;
+    };
 
 interface StoreBuilder<T> {
-  defaultState: DefaultState<T>
-  useStore: () => [T, Updater<T>]
-  useSelector: <S>(selector: (state: T) => S) => S
-  subject$: BehaviorSubject<T>
-  update: Updater<T>
-  getValue: () => T
+  defaultState: DefaultState<T>;
+  useStore: () => [T, Updater<T>];
+  useSelector: <S>(selector: (state: T) => S) => S;
+  subject$: BehaviorSubject<T>;
+  update: Updater<T>;
+  getValue: () => T;
 }
 
-const createStore = <T>(initialState: T) => {
-  let storeInstance: BehaviorSubject<T> | null = null;
-
-  return () => {
-    if (storeInstance === null) {
-      storeInstance = new BehaviorSubject<T>(initialState);
-    }
-    return storeInstance;
-  };
-};
-
 const isDefaultState = <T>(
-  defaultState: DefaultState<T>
+  defaultState: DefaultState<T>,
 ): defaultState is T => {
   if (
     typeof defaultState === 'object' &&
@@ -46,15 +35,13 @@ const isDefaultState = <T>(
 };
 
 export const buildClassicStore = async <T>(
-  defaultState: DefaultState<T>
+  defaultState: DefaultState<T>,
 ): Promise<StoreBuilder<T>> => {
   const initialState = isDefaultState<T>(defaultState)
     ? defaultState
     : await defaultState.hydrator();
 
-  const getStoreInstance = createStore(initialState);
-
-  const store = getStoreInstance();
+  const store = new BehaviorSubject<T>(initialState);
 
   const update: Updater<T> = (updater) => {
     store.next(updater(store.getValue()));
@@ -64,7 +51,7 @@ export const buildClassicStore = async <T>(
     const subscribe = (onStoreChange: () => void) => {
       const subscription = store.subscribe({
         next: onStoreChange,
-        error: console.error
+        error: console.error,
       });
 
       return () => {
@@ -74,7 +61,7 @@ export const buildClassicStore = async <T>(
     const state: T = useSyncExternalStore(
       subscribe,
       () => store.getValue(),
-      () => initialState
+      () => initialState,
     );
 
     return [state, update] satisfies [T, Updater<T>];
@@ -94,6 +81,6 @@ export const buildClassicStore = async <T>(
     useSelector,
     subject$: store,
     update,
-    getValue: () => store.getValue()
+    getValue: () => store.getValue(),
   };
 };

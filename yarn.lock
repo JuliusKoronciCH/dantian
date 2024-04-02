@@ -4976,6 +4976,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash.set@npm:^4":
+  version: 4.3.9
+  resolution: "@types/lodash.set@npm:4.3.9"
+  dependencies:
+    "@types/lodash": "npm:*"
+  checksum: 10c0/d7f3c3da593582e48b351fec2361b1aa551e6a7e6a387bdcc3a0c9a00eb2d8336f1dd911f619685d6c5875a404f97dc4fa0b1b5a7a25bc9145eaca1940071627
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:*":
+  version: 4.17.0
+  resolution: "@types/lodash@npm:4.17.0"
+  checksum: 10c0/4c5b41c9a6c41e2c05d08499e96f7940bcf194dcfa84356235b630da920c2a5e05f193618cea76006719bec61c76617dff02defa9d29934f9f6a76a49291bd8f
+  languageName: node
+  linkType: hard
+
 "@types/lodash@npm:^4.14.167":
   version: 4.14.202
   resolution: "@types/lodash@npm:4.14.202"
@@ -6957,6 +6973,7 @@ __metadata:
     "@storybook/react-vite": "npm:^7.6.17"
     "@storybook/test": "npm:^7.6.17"
     "@storybook/testing-library": "npm:^0.2.2"
+    "@types/lodash.set": "npm:^4"
     "@types/node": "npm:^20.11.20"
     "@typescript-eslint/eslint-plugin": "npm:^6.4.0"
     "@typescript-eslint/parser": "npm:^7.0.2"
@@ -6971,6 +6988,7 @@ __metadata:
     husky: "npm:^9.0.11"
     jsdom: "npm:^24.0.0"
     lint-staged: "npm:^15.2.2"
+    lodash.set: "npm:^4.3.2"
     prettier: "npm:^3.2.5"
     react: "npm:18.2.0"
     react-dom: "npm:^18.2.0"
@@ -10277,6 +10295,13 @@ __metadata:
   version: 4.6.2
   resolution: "lodash.mergewith@npm:4.6.2"
   checksum: 10c0/4adbed65ff96fd65b0b3861f6899f98304f90fd71e7f1eb36c1270e05d500ee7f5ec44c02ef979b5ddbf75c0a0b9b99c35f0ad58f4011934c4d4e99e5200b3b5
+  languageName: node
+  linkType: hard
+
+"lodash.set@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "lodash.set@npm:4.3.2"
+  checksum: 10c0/c641d31905e51df43170dce8a1d11a1cff11356e2e2e75fe2615995408e9687d58c3e1d64c3c284c2df2bc519f79a98af737d2944d382ff82ffd244ff6075c29
   languageName: node
   linkType: hard
 

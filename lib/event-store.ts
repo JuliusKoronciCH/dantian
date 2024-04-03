@@ -26,14 +26,20 @@ export function createEventStore<T extends object>(
       payload: initialState,
     },
   );
-  const publish = (event: NestedEvent<T>) => globalEventStore.next(event);
+  const publish = <
+    TType extends PropertyPath<T>,
+    TPayload extends GetValueType<T, TType>,
+  >(
+    type: TType,
+    payload: TPayload,
+  ) => globalEventStore.next({ type, payload } as NestedEvent<T>);
 
-  const getPropertyObservable = (
-    eventType: PropertyPath<T>,
-  ): Observable<GetValueType<T, PropertyPath<T>>> => {
+  const getPropertyObservable = <K extends PropertyPath<T>>(
+    eventType: K,
+  ): Observable<GetValueType<T, K>> => {
     return globalEventStore.pipe(
       filter((event) => event.type === eventType),
-      map((event) => event.payload as GetValueType<T, PropertyPath<T>>),
+      map((event) => event.payload as GetValueType<T, K>),
       scan((__, curr) => curr),
       distinctUntilChanged(),
     );
@@ -83,16 +89,16 @@ export function createEventStore<T extends object>(
 
   state$.subscribe({ next: options?.persist });
 
-  const useStoreValue = (type: PropertyPath<T>) => {
-    const [value, setValue] = useState<GetValueType<T, PropertyPath<T>>>(
+  const useStoreValue = <K extends PropertyPath<T>>(
+    type: K,
+  ): [GetValueType<T, K>, (payload: GetValueType<T, K>) => void] => {
+    const [value, setValue] = useState<GetValueType<T, K>>(
       get(type, state$.getValue()),
     );
-    const handleUpdate = useCallback(
-      (payload: GetValueType<T, PropertyPath<T>>) => {
-        publish({ type, payload });
-      },
-      [],
-    );
+    const handleUpdate = useCallback((payload: GetValueType<T, K>) => {
+      publish(type, payload);
+    }, []);
+
     useEffect(() => {
       const subscription = getHydrationObservable$().subscribe({
         next: (nextState) => {

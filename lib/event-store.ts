@@ -15,7 +15,7 @@ import {
 } from './types';
 import { set, get } from 'lodash/fp';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function createEventStore<T extends object>(
   initialState: T,
@@ -151,7 +151,8 @@ export function createEventStore<T extends object>(
         subscription.unsubscribe();
       };
     }, []);
-    return isHydrated;
+
+    return useMemo(() => isHydrated, [isHydrated]);
   };
   const systemEvents$ = globalEventStore.pipe(
     filter((event) => event.type.startsWith('@@')),

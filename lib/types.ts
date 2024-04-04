@@ -19,10 +19,10 @@ export type GetValueType<
     ? T[Path]
     : never;
 
-export type NestedEvent<T> = {
-  type: PropertyPath<T>;
-  payload: GetValueType<T, PropertyPath<T>>;
-};
+export interface NestedEvent<T> {
+  type: PropertyPath<T>
+  payload: GetValueType<T, PropertyPath<T>>
+}
 export type SystemEvent<T> =
-  | { type: '@@INIT'; payload: T }
-  | { type: '@@HYDRATED'; payload: T };
+  | { type: '@@INIT', payload: T }
+  | { type: '@@HYDRATED', payload: T };

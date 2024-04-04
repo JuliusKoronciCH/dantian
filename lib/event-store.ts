@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, type Observable } from 'rxjs';
 import {
   distinctUntilChanged,
   filter,
@@ -7,8 +7,14 @@ import {
   startWith,
   tap,
 } from 'rxjs/operators';
-import { GetValueType, NestedEvent, PropertyPath, SystemEvent } from './types';
+import {
+  type GetValueType,
+  type NestedEvent,
+  type PropertyPath,
+  type SystemEvent,
+} from './types';
 import { set, get } from 'lodash/fp';
+
 import { useCallback, useEffect, useState } from 'react';
 
 export function createEventStore<T extends object>(
@@ -19,7 +25,7 @@ export function createEventStore<T extends object>(
     persist?: (state: T) => Promise<void>;
   },
 ) {
-  const debug = !!options?.debug;
+  const debug = options?.debug === true ? options.debug : false;
   const globalEventStore = new BehaviorSubject<NestedEvent<T> | SystemEvent<T>>(
     {
       type: '@@INIT',
@@ -32,7 +38,10 @@ export function createEventStore<T extends object>(
   >(
     type: TType,
     payload: TPayload,
-  ) => globalEventStore.next({ type, payload } as NestedEvent<T>);
+  ) => {
+    const event = { type, payload } as NestedEvent<T>;
+    globalEventStore.next(event);
+  };
 
   const getPropertyObservable = <K extends PropertyPath<T>>(
     eventType: K,
@@ -92,9 +101,8 @@ export function createEventStore<T extends object>(
   const useStoreValue = <K extends PropertyPath<T>>(
     type: K,
   ): [GetValueType<T, K>, (payload: GetValueType<T, K>) => void] => {
-    const [value, setValue] = useState<GetValueType<T, K>>(
-      get(type, state$.getValue()),
-    );
+    const defaultValue: GetValueType<T, K> = get(type, state$.getValue());
+    const [value, setValue] = useState<GetValueType<T, K>>(defaultValue);
     const handleUpdate = useCallback((payload: GetValueType<T, K>) => {
       publish(type, payload);
     }, []);
@@ -102,7 +110,7 @@ export function createEventStore<T extends object>(
     useEffect(() => {
       const subscription = getHydrationObservable$().subscribe({
         next: (nextState) => {
-          setValue(get(type, nextState));
+          setValue(get(type, nextState) as GetValueType<T, K>);
         },
       });
 
@@ -125,8 +133,9 @@ export function createEventStore<T extends object>(
     return [value, handleUpdate];
   };
   const useHydrateStore = () => {
-    return (payload: T) =>
+    return (payload: T) => {
       globalEventStore.next({ type: '@@HYDRATED', payload });
+    };
   };
   const useIsHydrated = () => {
     const [isHydrated, setIsHydrated] = useState(false);

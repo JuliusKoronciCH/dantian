@@ -39,6 +39,7 @@ export function createEventStore<T extends object>(
     type: TType,
     payload: TPayload,
   ) => {
+    // eslint-disable-next-line
     const event = { type, payload } as NestedEvent<T>;
     globalEventStore.next(event);
   };

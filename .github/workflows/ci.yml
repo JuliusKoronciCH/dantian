@@ -70,6 +70,7 @@ jobs:
       - name: Publish to npm (on merge to main)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
+          ls -lah 
           yarn standard-version
           git push origin main --follow-tags
           npm publish --tag beta

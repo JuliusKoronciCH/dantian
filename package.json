@@ -5,6 +5,9 @@
   "main": "./dist/dantian.cjs",
   "module": "./dist/dantian.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "test": "vitest",

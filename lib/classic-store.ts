@@ -21,17 +21,6 @@ interface StoreBuilder<T> {
   getValue: () => T
 }
 
-const createStore = <T>(initialState: T) => {
-  let storeInstance: BehaviorSubject<T> | null = null;
-
-  return () => {
-    if (storeInstance === null) {
-      storeInstance = new BehaviorSubject<T>(initialState);
-    }
-    return storeInstance;
-  };
-};
-
 const isDefaultState = <T>(
   defaultState: DefaultState<T>
 ): defaultState is T => {
@@ -52,9 +41,7 @@ export const buildClassicStore = async <T>(
     ? defaultState
     : await defaultState.hydrator();
 
-  const getStoreInstance = createStore(initialState);
-
-  const store = getStoreInstance();
+  const store = new BehaviorSubject<T>(initialState);
 
   const update: Updater<T> = (updater) => {
     store.next(updater(store.getValue()));

@@ -68,7 +68,7 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
           yarn standard-version
-          git push origin main --follow-tags
+          git push origin main --follow-tags --force
           npm publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

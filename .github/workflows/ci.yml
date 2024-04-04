@@ -65,9 +65,7 @@ jobs:
         run: |
           current_version=$(node -p "require('./package.json').version")
           next_version=$(echo $current_version | awk -F'[.-]' '{print $1"."$2"."$3+1"-beta.1"}')
-          echo "$next_version" > version.txt
-          yarn config set version "$(cat version.txt)"
-          rm version.txt
+          jq --arg new_version "$next_version" '.version = $new_version' package.json > tmp.json && mv tmp.json package.json
           yarn publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

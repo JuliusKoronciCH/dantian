@@ -21,7 +21,7 @@ export function createEventStore<T extends object>(
   initialState: T,
   options?: {
     debug?: boolean;
-    hydrator: () => Promise<T>;
+    hydrator?: () => Promise<T>;
     persist?: (state: T) => Promise<void>;
   },
 ) {
@@ -134,9 +134,9 @@ export function createEventStore<T extends object>(
     return [value, handleUpdate];
   };
   const useHydrateStore = () => {
-    return (payload: T) => {
+    return useCallback((payload: T) => {
       globalEventStore.next({ type: '@@HYDRATED', payload });
-    };
+    }, []);
   };
   const useIsHydrated = () => {
     const [isHydrated, setIsHydrated] = useState(false);

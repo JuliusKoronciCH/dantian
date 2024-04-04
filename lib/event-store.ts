@@ -26,12 +26,12 @@ export function createEventStore<T extends object>(
   },
 ) {
   const debug = options?.debug === true ? options.debug : false;
-  const globalEventStore = new BehaviorSubject<NestedEvent<T> | SystemEvent<T>>(
-    {
-      type: '@@INIT',
-      payload: initialState,
-    },
-  );
+  const globalEventStore$ = new BehaviorSubject<
+    NestedEvent<T> | SystemEvent<T>
+  >({
+    type: '@@INIT',
+    payload: initialState,
+  });
   const publish = <
     TType extends PropertyPath<T>,
     TPayload extends GetValueType<T, TType>,
@@ -41,13 +41,13 @@ export function createEventStore<T extends object>(
   ) => {
     // eslint-disable-next-line
     const event = { type, payload } as NestedEvent<T>;
-    globalEventStore.next(event);
+    globalEventStore$.next(event);
   };
 
   const getPropertyObservable = <K extends PropertyPath<T>>(
     eventType: K,
   ): Observable<GetValueType<T, K>> => {
-    return globalEventStore.pipe(
+    return globalEventStore$.pipe(
       filter((event) => event.type.startsWith(eventType)),
       map((event) => event.payload as GetValueType<T, K>),
       scan((__, curr) => curr),
@@ -56,7 +56,7 @@ export function createEventStore<T extends object>(
   };
 
   const getHydrationObservable$ = (): Observable<T> => {
-    return globalEventStore.pipe(
+    return globalEventStore$.pipe(
       filter((event) => event.type === '@@HYDRATED'),
       map((event) => event.payload as T),
       scan((__, curr) => curr),
@@ -66,7 +66,7 @@ export function createEventStore<T extends object>(
 
   const state$ = new BehaviorSubject<T>(initialState);
 
-  globalEventStore
+  globalEventStore$
     .pipe(
       tap((event) => {
         if (debug) {
@@ -91,7 +91,7 @@ export function createEventStore<T extends object>(
   options
     ?.hydrator?.()
     .then((payload) => {
-      globalEventStore.next({ type: '@@HYDRATED', payload });
+      globalEventStore$.next({ type: '@@HYDRATED', payload });
     })
     .catch((error) => {
       console.error('Failed to hydrate store', error);
@@ -135,7 +135,7 @@ export function createEventStore<T extends object>(
   };
   const useHydrateStore = () => {
     return useCallback((payload: T) => {
-      globalEventStore.next({ type: '@@HYDRATED', payload });
+      globalEventStore$.next({ type: '@@HYDRATED', payload });
     }, []);
   };
   const useIsHydrated = () => {
@@ -154,7 +154,7 @@ export function createEventStore<T extends object>(
 
     return useMemo(() => isHydrated, [isHydrated]);
   };
-  const systemEvents$ = globalEventStore.pipe(
+  const systemEvents$ = globalEventStore$.pipe(
     filter((event) => event.type.startsWith('@@')),
   );
 
@@ -166,5 +166,6 @@ export function createEventStore<T extends object>(
     getPropertyObservable,
     state$,
     systemEvents$,
+    globalEventStore$,
   };
 }

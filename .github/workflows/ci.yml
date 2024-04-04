@@ -13,7 +13,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
+      - name: Configure Git
+        run: |
+          git config --global user.name "JuliusKoronciCH"
+          git config --global user.email "julius.koronci@gmail.com"
+      - uses: actions/checkout@v3
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:

@@ -38,7 +38,7 @@ export function createEventStore<T extends object>(
     eventType: K,
   ): Observable<GetValueType<T, K>> => {
     return globalEventStore.pipe(
-      filter((event) => event.type === eventType),
+      filter((event) => event.type.startsWith(eventType)),
       map((event) => event.payload as GetValueType<T, K>),
       scan((__, curr) => curr),
       distinctUntilChanged(),

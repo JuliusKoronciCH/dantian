@@ -57,3 +57,13 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+      - name: Publish to npm (on merge to main)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: |
+          current_version=$(node -p "require('./package.json').version")
+          next_version=$(echo $current_version | awk -F'[.-]' '{print $1"."$2"."$3+1"-beta.1"}')
+          yarn version --no-git-tag-version --new-version $next_version
+          yarn publish --tag beta
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

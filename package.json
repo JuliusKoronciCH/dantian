@@ -1,6 +1,7 @@
 {
   "name": "dantian",
   "version": "0.0.2-beta.6",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/dantian.cjs",
   "module": "./dist/dantian.js",

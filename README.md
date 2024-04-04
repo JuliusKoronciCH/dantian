@@ -1,6 +1,6 @@
 **Dantian - React State Management Reimagined**
 
-npm version: [replace with package version badge]
+[![npm version](https://badge.fury.io/js/dantian.svg)](https://badge.fury.io/js/dantian)
 
 Dantian is an event-based state management library for React applications that delivers pinpoint performance and effortless integration with forms. Say goodbye to unnecessary rerenders and complex state comparisons – Dantian ensures that components only update when they subscribe to specific state changes.
 

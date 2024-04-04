@@ -7,7 +7,9 @@ module.exports = {
     'standard-with-typescript',
     'plugin:react/recommended',
     'plugin:storybook/recommended',
+    'prettier',
   ],
+  plugins: ['prettier'],
   overrides: [],
   parserOptions: {
     ecmaVersion: 'latest',

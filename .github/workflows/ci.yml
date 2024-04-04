@@ -51,6 +51,9 @@ jobs:
       - name: Run Tests
         run: yarn test
 
+      - name: Run Build
+        run: yarn build
+
       - name: Start Storybook
         run: yarn storybook &
 

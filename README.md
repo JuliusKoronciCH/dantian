@@ -374,6 +374,9 @@ const [count, setCount] = useStoreValue('count');
 // Access a property and disable caching
 const [profileName, setProfileName] = useStoreValue('profile.name', { disableCache: true });
 
+// Access a property and set frequency of updates
+const [profileEmail, setProfileEmail] = useStoreValue('profile.email', { throttle: 100 });
+
 ```
 
 By default, useStoreValue maintains local state, ensuring immediate updates without waiting for a roundtrip through the global store. When the store is updated, the value is propagated back to the hook, synchronizing the local state.
@@ -394,7 +397,7 @@ MIT
   - Parameters:
     - `initialState`: The initial state object of your store.
     - `options`: An optional object containing configuration settings:
-      - `debug`: Enables debug logging (default: `false`).
+      - `debug`: Enables debug logging (default: `false`).
       - `hydrator`: An asynchronous function returning a promise resolving to the hydration data.
       - `persist`: An asynchronous function to handle state persistence.
 
@@ -405,7 +408,7 @@ MIT
     - `type`: The property path within the store to be updated (e.g., 'count', 'profile.name').
     - `payload`: The new value for the specified property.
 
-- `getPropertyObservable<K extends PropertyPath<T>>(eventType: K)`
+- `getPropertyObservable<K extends PropertyPath<T>>(eventType: K, throttle?: number)`
 
   - Returns an RxJS Observable that emits values whenever the specified property in the store is updated.
 
@@ -422,20 +425,21 @@ MIT
   - React hook to access and update a specific property within the store.
   - Parameters:
     - `type`: The property path within the store.
-    - `options`: Optional object with a `disableCache` property to control local caching behavior.
-  - Returns: An array containing:
+    - `options.disableCache`: boolean property to control local caching behavior.
+    - `options.throtle`: numeric property to control frequency of updates in ms.
+  - Returns: An array containing:
     - The current value of the property.
     - A function to update the property.
 
 - `useHydrateStore()`
 
   - React hook to trigger store hydration.
-  - Returns: A function to initialize the store with hydrated data.
+  - Returns: A function to initialize the store with hydrated data.
 
 - `useIsHydrated()`
 
   - React hook to determine if the store is hydrated.
-  - Returns: A boolean indicating hydration status.
+  - Returns: A boolean indicating hydration status.
 
 - `systemEvents$`
 

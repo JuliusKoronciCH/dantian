@@ -111,8 +111,6 @@ export function createEventStore<T extends object>(
   ): [GetValueType<T, K>, (payload: GetValueType<T, K>) => void] => {
     const disableCache = options?.disableCache ?? false;
 
-    const disableCache = options?.disableCache ?? false;
-
     const defaultValue: GetValueType<T, K> = get(type, state$.getValue());
 
 

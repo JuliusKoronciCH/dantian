@@ -374,6 +374,9 @@ const [count, setCount] = useStoreValue('count');
 // Access a property and disable caching
 const [profileName, setProfileName] = useStoreValue('profile.name', { disableCache: true });
 
+// Emit updates every 300ms to avoid too many rerenders
+const [email, setEmail] = useStoreValue('profile.email', { throttle: 300 });
+
 ```
 
 By default, useStoreValue maintains local state, ensuring immediate updates without waiting for a roundtrip through the global store. When the store is updated, the value is propagated back to the hook, synchronizing the local state.
@@ -405,7 +408,7 @@ MIT
     - `type`: The property path within the store to be updated (e.g., 'count', 'profile.name').
     - `payload`: The new value for the specified property.
 
-- `getPropertyObservable<K extends PropertyPath<T>>(eventType: K)`
+- `getPropertyObservable<K extends PropertyPath<T>>(eventType: K, throtle?: number)`
 
   - Returns an RxJS Observable that emits values whenever the specified property in the store is updated.
 
@@ -422,7 +425,8 @@ MIT
   - React hook to access and update a specific property within the store.
   - Parameters:
     - `type`: The property path within the store.
-    - `options`: Optional object with a `disableCache` property to control local caching behavior.
+    - `options.disableCache`:  property to control local caching behavior.
+    - `options.throtle`: property to control frequency of updates.
   - Returns: An array containing:
     - The current value of the property.
     - A function to update the property.

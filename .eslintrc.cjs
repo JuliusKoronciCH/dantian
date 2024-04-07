@@ -18,6 +18,7 @@ module.exports = {
   plugins: ['react'],
   rules: {
     '@typescript-eslint/semi': 'off',
+    '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
   },
   settings: {

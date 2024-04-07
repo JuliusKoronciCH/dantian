@@ -101,10 +101,16 @@ export function createEventStore<T extends object>(
 
   const useStoreValue = <K extends PropertyPath<T>>(
     type: K,
+    options?: { disableCache?: boolean },
   ): [GetValueType<T, K>, (payload: GetValueType<T, K>) => void] => {
+    const disableCache = options?.disableCache ?? false;
+
     const defaultValue: GetValueType<T, K> = get(type, state$.getValue());
+
     const [value, setValue] = useState<GetValueType<T, K>>(defaultValue);
+
     const handleUpdate = useCallback((payload: GetValueType<T, K>) => {
+      if (!disableCache) setValue(payload);
       publish(type, payload);
     }, []);
 
@@ -133,6 +139,7 @@ export function createEventStore<T extends object>(
 
     return [value, handleUpdate];
   };
+
   const useHydrateStore = () => {
     return useCallback((payload: T) => {
       globalEventStore$.next({ type: '@@HYDRATED', payload });

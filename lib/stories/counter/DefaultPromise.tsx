@@ -1,5 +1,4 @@
 import { Button, Flex, Text } from '@radix-ui/themes';
-import React from 'react';
 import useStore, { useCounterPromiseSelector } from './counterStorePromise';
 
 export const DefaultPromise = () => {

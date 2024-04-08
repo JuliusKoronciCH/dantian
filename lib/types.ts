@@ -1,18 +1,24 @@
 export type IsObject<T> = T extends object ? true : false;
 
 export type PropertyPath<T> = {
-  [K in keyof T]: IsObject<T[K]> extends true ? PropertyPath<T[K]> : string;
+  [K in keyof T]: K extends string
+    ? T[K] extends object
+      ? `${K}.${PropertyPath<T[K]>}` | K
+      : K
+    : never;
 }[keyof T];
 
 export type GetValueType<
   T,
-  P extends PropertyPath<T>,
-> = P extends `${infer K}.${infer Rest}`
-  ? K extends keyof T
-    ? GetValueType<T[K], Rest>
+  Path extends PropertyPath<T>,
+> = Path extends `${infer Key}.${infer Rest}`
+  ? Key extends keyof T
+    ? Rest extends PropertyPath<T[Key]>
+      ? GetValueType<T[Key], Rest>
+      : never
     : never
-  : P extends keyof T
-    ? T[P]
+  : Path extends keyof T
+    ? T[Path]
     : never;
 
 export interface NestedEvent<T> {

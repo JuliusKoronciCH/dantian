@@ -1,9 +1,11 @@
-import { BehaviorSubject, type Observable } from 'rxjs';
+import { BehaviorSubject, Subject, type Observable } from 'rxjs';
 import {
+  auditTime,
   distinctUntilChanged,
   filter,
   map,
   scan,
+  share,
   startWith,
   tap,
 } from 'rxjs/operators';
@@ -46,13 +48,17 @@ export function createEventStore<T extends object>(
 
   const getPropertyObservable = <K extends PropertyPath<T>>(
     eventType: K,
+    throttle?: number,
   ): Observable<GetValueType<T, K>> => {
-    return globalEventStore$.pipe(
+    const observable = globalEventStore$.pipe(
       filter((event) => event.type.startsWith(eventType)),
       map((event) => event.payload as GetValueType<T, K>),
-      scan((__, curr) => curr),
-      distinctUntilChanged(),
+      share({ connector: () => new Subject(), resetOnRefCountZero: true }),
     );
+    if (throttle) {
+      observable.pipe(auditTime(throttle));
+    }
+    return observable;
   };
 
   const getHydrationObservable$ = (): Observable<T> => {
@@ -101,10 +107,19 @@ export function createEventStore<T extends object>(
 
   const useStoreValue = <K extends PropertyPath<T>>(
     type: K,
+    options?: { disableCache?: boolean; throtle?: number },
   ): [GetValueType<T, K>, (payload: GetValueType<T, K>) => void] => {
+    const disableCache = options?.disableCache ?? false;
+
     const defaultValue: GetValueType<T, K> = get(type, state$.getValue());
+
+
     const [value, setValue] = useState<GetValueType<T, K>>(defaultValue);
+
+
     const handleUpdate = useCallback((payload: GetValueType<T, K>) => {
+      if (!disableCache) setValue(payload);
+      if (!disableCache) setValue(payload);
       publish(type, payload);
     }, []);
 
@@ -121,7 +136,10 @@ export function createEventStore<T extends object>(
     }, []);
 
     useEffect(() => {
-      const subscription = getPropertyObservable(type).subscribe({
+      const subscription = getPropertyObservable(
+        type,
+        options?.throtle,
+      ).subscribe({
         next: (value) => {
           setValue(value);
         },
@@ -133,6 +151,8 @@ export function createEventStore<T extends object>(
 
     return [value, handleUpdate];
   };
+
+
   const useHydrateStore = () => {
     return useCallback((payload: T) => {
       globalEventStore$.next({ type: '@@HYDRATED', payload });

@@ -1,13 +1,16 @@
 {
   "name": "dantian",
   "license": "MIT",
-  "version": "0.0.2-beta.7",
+  "version": "0.0.2-beta.10",
   "type": "module",
   "main": "./dist/dantian.cjs",
   "module": "./dist/dantian.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "dev": "vite",

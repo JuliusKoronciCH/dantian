@@ -1,4 +1,4 @@
-interface State {
+export interface State {
   user: {
     name: string;
     address: {

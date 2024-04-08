@@ -83,6 +83,7 @@ export function createEventStore<T extends object>(
         if (event.type === '@@INIT' || event.type === '@@HYDRATED') {
           return event.payload as T;
         }
+
         return set(event.type, event.payload, state);
       }, initialState),
       tap((state) => {
@@ -113,9 +114,7 @@ export function createEventStore<T extends object>(
 
     const defaultValue: GetValueType<T, K> = get(type, state$.getValue());
 
-
     const [value, setValue] = useState<GetValueType<T, K>>(defaultValue);
-
 
     const handleUpdate = useCallback((payload: GetValueType<T, K>) => {
       if (!disableCache) setValue(payload);
@@ -151,7 +150,6 @@ export function createEventStore<T extends object>(
 
     return [value, handleUpdate];
   };
-
 
   const useHydrateStore = () => {
     return useCallback((payload: T) => {

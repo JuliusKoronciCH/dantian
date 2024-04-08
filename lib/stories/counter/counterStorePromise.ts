@@ -1,11 +1,11 @@
-import { buildClassicStore } from '../../lib';
+import { buildClassicStore } from '../..';
 
 export interface CounterState {
   count: number;
 }
 
 const counterStore3Builder = await buildClassicStore<CounterState>({
-  hydrator: () => Promise.resolve({ count: 88 }),
+  hydrator: async () => await Promise.resolve({ count: 88 }),
   beforeLoadState: { count: 0 },
 });
 const { useStore, useSelector: useCounterPromiseSelector } =

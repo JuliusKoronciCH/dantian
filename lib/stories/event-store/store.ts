@@ -1,5 +1,5 @@
-import { createEventStore } from '../../lib';
-import { State } from './state';
+import { createEventStore } from '../..';
+import { type State } from './state';
 
 export const {
   state$,
@@ -15,11 +15,11 @@ export const {
     user: { address: { city: 'n/a', street: 'n/a' }, name: 'n/a' },
   },
   {
-    hydrator: () => {
-      return new Promise((resolve) => {
+    hydrator: async () => {
+      return await new Promise((resolve) => {
         setTimeout(
           () =>
-            resolve({
+            { resolve({
               user: {
                 address: {
                   city: 'Aubonne',
@@ -27,7 +27,7 @@ export const {
                 },
                 name: 'Julius',
               },
-            }),
+            }); },
           3000,
         );
       });

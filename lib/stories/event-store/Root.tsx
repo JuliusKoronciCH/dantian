@@ -1,6 +1,4 @@
 import { Flex } from '@radix-ui/themes';
-
-import React from 'react';
 import { state$, useStoreValue } from './store';
 
 export const Root = () => {

@@ -1,4 +1,4 @@
-import { buildClassicStore } from '../../lib';
+import { buildClassicStore } from '../..';
 
 export interface CounterState {
   count: number;

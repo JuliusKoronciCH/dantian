@@ -70,6 +70,23 @@ export function createEventStore<T extends object>(
     );
   };
 
+  const getResetObservable$ = (): Observable<T> => {
+    return globalEventStore$.pipe(
+      filter((event) => event.type === '@@RESET'),
+      map((event) => event.payload as T),
+      scan((__, curr) => curr),
+      distinctUntilChanged(),
+    );
+  };
+  const getFeedObservable$ = (): Observable<T> => {
+    return globalEventStore$.pipe(
+      filter((event) => event.type === '@@FEED'),
+      map((event) => event.payload as T),
+      scan((__, curr) => curr),
+      distinctUntilChanged(),
+    );
+  };
+
   const state$ = new BehaviorSubject<T>(initialState);
 
   globalEventStore$
@@ -80,7 +97,12 @@ export function createEventStore<T extends object>(
         }
       }),
       scan((state, event) => {
-        if (event.type === '@@INIT' || event.type === '@@HYDRATED') {
+        if (
+          event.type === '@@INIT' ||
+          event.type === '@@HYDRATED' ||
+          event.type === '@@RESET' ||
+          event.type === '@@FEED'
+        ) {
           return event.payload as T;
         }
 
@@ -135,6 +157,29 @@ export function createEventStore<T extends object>(
     }, []);
 
     useEffect(() => {
+      const subscription = getResetObservable$().subscribe({
+        next: (nextState) => {
+          setValue(get(type, nextState) as GetValueType<T, K>);
+        },
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }, []);
+    useEffect(() => {
+      const subscription = getFeedObservable$().subscribe({
+        next: (nextState) => {
+          setValue(get(type, nextState) as GetValueType<T, K>);
+        },
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }, []);
+
+    useEffect(() => {
       const subscription = getPropertyObservable(
         type,
         options?.throtle,
@@ -162,6 +207,17 @@ export function createEventStore<T extends object>(
       const subscription = getHydrationObservable$().subscribe({
         next: () => {
           setIsHydrated(true);
+        },
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }, []);
+    useEffect(() => {
+      const subscription = getResetObservable$().subscribe({
+        next: () => {
+          setIsHydrated(false);
         },
       });
 

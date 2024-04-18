@@ -27,4 +27,6 @@ export interface NestedEvent<T> {
 }
 export type SystemEvent<T> =
   | { type: '@@INIT'; payload: T }
-  | { type: '@@HYDRATED'; payload: T };
+  | { type: '@@HYDRATED'; payload: T }
+  | { type: '@@RESET'; payload: T }
+  | { type: '@@FEED'; payload: T };

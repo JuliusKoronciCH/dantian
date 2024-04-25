@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.2-beta.15 (2024-04-25)
+
+
+### Bug Fixes
+
+* child property observable ([#16](https://github.com/JuliusKoronciCH/dantian/issues/16)) ([6d33779](https://github.com/JuliusKoronciCH/dantian/commit/6d33779d5dfe7d51cd7e2e75f0b3a20fe88bcf41))
+
 ### 0.0.2-beta.14 (2024-04-25)
 
 ### 0.0.2-beta.13 (2024-04-25)

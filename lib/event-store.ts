@@ -51,7 +51,7 @@ export function createEventStore<T extends object>(
     throttle?: number,
   ): Observable<GetValueType<T, K>> => {
     const observable = globalEventStore$.pipe(
-      filter((event) => event.type.startsWith(eventType)),
+      filter((event) => event.type === eventType),
       map((event) => event.payload as GetValueType<T, K>),
       share({ connector: () => new Subject(), resetOnRefCountZero: true }),
     );

@@ -51,8 +51,22 @@ export function createEventStore<T extends object>(
     throttle?: number,
   ): Observable<GetValueType<T, K>> => {
     const observable = globalEventStore$.pipe(
-      filter((event) => event.type.startsWith(eventType)),
+      filter((event) => event.type === eventType),
       map((event) => event.payload as GetValueType<T, K>),
+      share({ connector: () => new Subject(), resetOnRefCountZero: true }),
+    );
+    if (throttle) {
+      observable.pipe(auditTime(throttle));
+    }
+    return observable;
+  };
+
+  const getChildPropertyObservable = <K extends PropertyPath<T>>(
+    eventType: K,
+    throttle?: number,
+  ) => {
+    const observable = globalEventStore$.pipe(
+      filter((event) => event.type.startsWith(`${eventType}.`)),
       share({ connector: () => new Subject(), resetOnRefCountZero: true }),
     );
     if (throttle) {
@@ -144,6 +158,11 @@ export function createEventStore<T extends object>(
       publish(type, payload);
     }, []);
 
+    const restoreValueFromState$ = () => {
+      const stateValue: GetValueType<T, K> = get(type, state$.getValue());
+      setValue(stateValue);
+    };
+
     useEffect(() => {
       const subscription = getHydrationObservable$().subscribe({
         next: (nextState) => {
@@ -186,6 +205,20 @@ export function createEventStore<T extends object>(
       ).subscribe({
         next: (value) => {
           setValue(value);
+        },
+      });
+      return () => {
+        subscription.unsubscribe();
+      };
+    }, []);
+    useEffect(() => {
+      const subscription = getChildPropertyObservable(
+        type,
+        options?.throtle,
+      ).subscribe({
+        next: (event) => {
+          if (debug) console.log('CHILD PROPERTY OBSERVABLE', event);
+          setTimeout(restoreValueFromState$);
         },
       });
       return () => {

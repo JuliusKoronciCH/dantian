@@ -1,7 +1,7 @@
 {
   "name": "dantian",
   "license": "MIT",
-  "version": "0.0.2-beta.12",
+  "version": "0.0.2-beta.15",
   "type": "module",
   "main": "./dist/dantian.cjs",
   "module": "./dist/dantian.js",
@@ -72,7 +72,7 @@
     "standard-version": "^9.5.0",
     "storybook": "^7.6.17",
     "typescript": "5.4.4",
-    "vite": "^5.1.4",
+    "vite": "^5.1.7",
     "vite-plugin-dts": "^3.7.3",
     "vitest": "^1.3.1"
   },

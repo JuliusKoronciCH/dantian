@@ -154,7 +154,6 @@ export function createEventStore<T extends object>(
 
     const handleUpdate = useCallback((payload: GetValueType<T, K>) => {
       if (!disableCache) setValue(payload);
-      if (!disableCache) setValue(payload);
       publish(type, payload);
     }, []);
 

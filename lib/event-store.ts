@@ -102,6 +102,7 @@ export function createEventStore<T extends object>(
   };
 
   const state$ = new BehaviorSubject<T>(initialState);
+  const hydrationState$ = new BehaviorSubject(false);
 
   globalEventStore$
     .pipe(
@@ -130,6 +131,19 @@ export function createEventStore<T extends object>(
       startWith(initialState),
     )
     .subscribe(state$);
+
+  globalEventStore$.pipe(scan((state, event) => {
+    if (
+      event.type === '@@INIT' ||
+      event.type === '@@RESET'
+    ) {
+      return false;
+    }
+    if (event.type === '@@HYDRATED') {
+      return true;
+    }
+    return state;
+  }, false)).subscribe(hydrationState$);
 
   options
     ?.hydrator?.()
@@ -234,7 +248,7 @@ export function createEventStore<T extends object>(
     }, []);
   };
   const useIsHydrated = () => {
-    const [isHydrated, setIsHydrated] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(hydrationState$.getValue());
     useEffect(() => {
       const subscription = getHydrationObservable$().subscribe({
         next: () => {

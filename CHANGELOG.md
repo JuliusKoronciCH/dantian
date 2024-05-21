@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.2-beta.18 (2024-05-21)
+
+
+### Bug Fixes
+
+* useIsHydrated race condition fix on later call of the hook ([#19](https://github.com/JuliusKoronciCH/dantian/issues/19)) ([2c7c0ff](https://github.com/JuliusKoronciCH/dantian/commit/2c7c0ffbe1ecdab03b912508ca4410fc65e1f242))
+
 ### 0.0.2-beta.17 (2024-05-07)
 
 ### 0.0.2-beta.16 (2024-05-07)

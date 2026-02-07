@@ -5,7 +5,9 @@ import useStore, { useCounter2Selector } from './counterStore2';
 const CountText = () => {
   const count = useCounter2Selector((state) => state.count);
 
-  return <Text>We are counting second: {count}</Text>;
+  return (
+    <Text data-testid="counter2-count">We are counting second: {count}</Text>
+  );
 };
 
 export const Counter2 = () => {
@@ -15,9 +17,11 @@ export const Counter2 = () => {
   };
 
   return (
-    <Flex direction="column" gap="2">
+    <Flex direction="column" gap="2" data-testid="counter2">
       <CountText />
-      <Button onClick={increment}>Let's go, second counter</Button>
+      <Button onClick={increment} data-testid="counter2-increment">
+        Let&apos;s go, second counter
+      </Button>
     </Flex>
   );
 };

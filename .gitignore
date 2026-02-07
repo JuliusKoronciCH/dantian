@@ -7,6 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# AI/meta docs
+AGENTS.md
+requirements/
+
 node_modules
 dist
 dist-ssr
@@ -30,3 +34,4 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/coverage/

@@ -29,4 +29,6 @@ export type SystemEvent<T> =
   | { type: '@@INIT'; payload: T }
   | { type: '@@HYDRATED'; payload: T }
   | { type: '@@RESET'; payload: T }
-  | { type: '@@FEED'; payload: T };
+  | { type: '@@FEED'; payload: T }
+  | { type: '@@HYDRATE_ERROR'; payload: { error: unknown } }
+  | { type: '@@PERSIST_ERROR'; payload: { error: unknown } };

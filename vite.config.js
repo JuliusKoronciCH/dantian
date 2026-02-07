@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
+const externalPackages = ['react', 'react-dom', 'lodash', 'rxjs'];
+
 export default defineConfig({
   build: {
     copyPublicDir: false,
@@ -9,7 +11,8 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: (id) =>
+        externalPackages.some((pkg) => id === pkg || id.startsWith(`${pkg}/`)),
       output: {
         globals: {
           react: 'React',
@@ -17,5 +20,7 @@ export default defineConfig({
       },
     },
   },
-  plugins: [dts({ include: ['lib'], insertTypesEntry: true })],
+  plugins: [
+    dts({ tsconfigPath: './tsconfig.build.json', insertTypesEntry: true }),
+  ],
 });

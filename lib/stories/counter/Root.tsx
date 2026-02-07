@@ -6,7 +6,7 @@ import { DefaultPromise } from './DefaultPromise';
 
 export const Root = () => {
   return (
-    <Flex direction="column" gap="2">
+    <Flex direction="column" gap="2" data-testid="counter-root">
       <Counter />
       <Counter2 />
       <Counter3 />

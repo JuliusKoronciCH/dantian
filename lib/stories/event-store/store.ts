@@ -17,19 +17,17 @@ export const {
   {
     hydrator: async () => {
       return await new Promise((resolve) => {
-        setTimeout(
-          () =>
-            { resolve({
-              user: {
-                address: {
-                  city: 'Aubonne',
-                  street: 'Chemin du Mont-Blanc 16',
-                },
-                name: 'Julius',
+        setTimeout(() => {
+          resolve({
+            user: {
+              address: {
+                city: 'Aubonne',
+                street: 'Chemin du Mont-Blanc 16',
               },
-            }); },
-          3000,
-        );
+              name: 'Julius',
+            },
+          });
+        }, 3000);
       });
     },
     debug: true,

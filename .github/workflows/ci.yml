@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, master]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci-checks-and-publish:
     timeout-minutes: 60
@@ -13,10 +17,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Configure Git
-        run: |
-          git config --global user.name "JuliusKoronciCH"
-          git config --global user.email "julius.koronci@gmail.com"
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -81,14 +81,3 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-
-      - name: Publish to npm (on merge to main)
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        run: |
-          ls -lah 
-          yarn standard-version
-          git push origin main --follow-tags
-          yarn npm publish
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.CHANGELOG_TOKEN }}

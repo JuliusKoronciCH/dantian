@@ -57,7 +57,7 @@ jobs:
         run: yarn test:coverage
 
       - name: Generate npm lockfile for audit
-        run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit
+        run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit --legacy-peer-deps
 
       - name: Run npm audit
         run: npm audit --omit=dev --audit-level=high

@@ -376,7 +376,9 @@ export const Root = ({
       if (!gridApiRef.current) return;
       const rowNodes = uniqueIds
         .map((tradeId) => gridApiRef.current?.getRowNode(tradeId) ?? null)
-        .filter((rowNode): rowNode is NonNullable<typeof rowNode> => rowNode !== null);
+        .filter(
+          (rowNode): rowNode is NonNullable<typeof rowNode> => rowNode !== null,
+        );
       if (rowNodes.length > 0) {
         gridApiRef.current.flashCells({
           rowNodes,

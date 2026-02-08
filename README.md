@@ -1,98 +1,6 @@
-# Dantian - Event-Based State Management
+# Dantian
 
-[![npm version](https://badge.fury.io/js/dantian.svg)](https://badge.fury.io/js/dantian)
-
-Dantian is an event-based state management library designed specifically for React applications. By embracing an event-driven architecture, Dantian offers a fresh approach to managing application state, providing developers with flexibility, efficiency, and simplicity.
-
-```
-import { useStoreValue } from './store';
-
-function ProfileForm() {
-  const [name, setName] = useStoreValue('profile.name');
-  const [city, setCity] = useStoreValue('profile.city');
-
-  return (
-    <form>
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-      <input type="text" value={city} onChange={(e) => setCity(e.target.value)} />
-    </form>
-  );
-}
-```
-
-## Why Dantian?
-
-```mermaid
-flowchart LR
-  subgraph Initialization
-    InitState["Initial State"] --> CreateStore["createEventStore() <br/> Dantian Event Store"]
-  end
-
-  subgraph Hydration
-    HydrationSource["Hydration Source <br/> (API, localStorage, etc.)"] --> |@@HYDRATED| CreateStore
-  end
-
-  subgraph PropertyUpdate
-    PublishEvent["publish(type, payload) <br/> Publish Event"] --> |type| CreateStore
-    CreateStore --> |type| SubscribedComponents["Subscribed Components"]
-    SubscribedComponents --> StateUpdate["Component State Update"]
-    StateUpdate --> UI["UI Update"]
-  end
-
-```
-
-### Efficient Updates
-
-Dantian leverages events as triggers for state updates, ensuring that only components subscribed to relevant events are re-rendered. This approach minimizes unnecessary re-renders and improves overall performance, especially in applications with complex state interactions.
-
-### Flexibility
-
-With Dantian, developers have complete control over how state updates are handled. There's no need to adhere to predefined structures or patterns imposed by a library. Instead, developers can define their own logic and workflows tailored to their specific needs, empowering them to build React applications that are both powerful and flexible.
-
-### Simplicity
-
-By embracing a declarative and functional approach, Dantian simplifies state management logic. Developers can focus on defining pure functions and utilities to handle state updates, leading to cleaner, more maintainable code. With Dantian, state management becomes intuitive and straightforward, even for complex applications.
-
-## Key Features
-
-- **Event-Based Architecture**: Dantian relies on events to trigger state updates, providing a clear and efficient mechanism for managing application state.
-- **Fine-Grained Control**: Developers can subscribe to specific events and define custom logic for handling state updates, giving them precise control over how their applications behave.
-- **Optimized Performance**: By minimizing unnecessary re-renders and focusing on efficient updates, Dantian ensures optimal performance even in large-scale applications with complex state interactions.
-- **Simplified Development**: With its intuitive API and focus on simplicity, Dantian makes state management easy and accessible for developers of all skill levels, reducing the learning curve and speeding up development time.
-
-## The React Landscape
-
-In the realm of React state management, various solutions like Zustand, Redux, and even React's built-in `useState` and `useReducer` hooks have become popular choices. However, they each come with their own set of trade-offs and considerations.
-
-### Zustand and Redux
-
-Zustand and Redux are excellent choices for managing global state in React applications. They offer centralized stores, actions, and reducers, making it easier to manage complex state interactions. However, they can sometimes introduce unnecessary boilerplate and complexity, especially for smaller applications or simple state management needs.
-
-### useState and useReducer
-
-On the other end of the spectrum, React's built-in `useState` and `useReducer` hooks provide a lightweight and straightforward way to manage local component state. They are perfect for managing state within individual components or handling simple UI interactions. However, they lack built-in mechanisms for managing global state or handling complex state interactions across multiple components.
-
-## The Downside of Traditional Approaches
-
-While these solutions have their merits, they often suffer from one common issue: excessive re-renders. Whether it's due to shallow comparisons, unnecessary updates, or complex state management logic, the result is the same: decreased performance and potential UI glitches.
-
-## The Promise of Event Sourcing
-
-Event-based state management offers a compelling alternative. By decoupling state updates from the underlying logic and relying solely on events to trigger updates, it provides a more predictable and efficient way to manage state.
-
-### Benefits of Event Sourcing
-
-- **Efficient Updates:** Events provide a clear trigger for state updates, ensuring that only the components subscribed to relevant events are re-rendered. This minimizes unnecessary re-renders and improves overall performance.
-- **Flexibility:** With event sourcing, developers have complete control over how state updates are handled. There's no need to adhere to predefined structures or patterns imposed by a library. Instead, developers can define their own logic and workflows tailored to their specific needs.
-- **Simplicity:** By embracing a more declarative and functional approach, event-based state management simplifies state management logic. Developers can focus on defining pure functions and utilities to handle state updates, leading to cleaner and more maintainable code.
-
-## Conclusion
-
-In a landscape filled with state management solutions, event-based state management offers a refreshing alternative. By prioritizing efficiency, flexibility, and simplicity, it empowers developers to build React applications that are performant, scalable, and easy to maintain.
-
----
-
-This readme aims to shed light on the benefits of event-based state management in React applications, highlighting its advantages over traditional approaches and offering insights into its potential impact on application development. By embracing event sourcing, developers can unlock new possibilities and overcome the limitations of existing state management solutions.
+Event-based state management for React, powered by RxJS. Dantian exposes a small event store API and React hooks that subscribe to specific property paths, so only the parts of UI that care about a given event re-render.
 
 ## Installation
 
@@ -100,347 +8,315 @@ This readme aims to shed light on the benefits of event-based state management i
 npm install dantian
 ```
 
-## Basic example
+## Compatibility
 
-```
+| Runtime | Supported versions |
+| ------- | ------------------ |
+| React   | 18, 19             |
+| RxJS    | 7, 8               |
+| Node    | 18, 20, 22         |
+
+## Use Cases & FAQ
+
+### Quickstart: event store basics
+
+```ts
 // store.ts
 import { createEventStore } from 'dantian';
 
-export const {
-  state$,
-  useStoreValue,
-  useHydrateStore,
-  useIsHydrated,
-  getPropertyObservable,
-  globalEventStore$,
-  publish,
-  systemEvents$,
-} = createEventStore({
+export const store = createEventStore({
   count: 0,
-  profile: { name: '', city: '' },
-  data: null,
-  isLoading: false
+  user: { name: 'n/a' },
 });
 
+export const {
+  useStoreValue,
+  publish,
+  useHydrateStore,
+  useIsHydrated,
+  reset,
+  feed,
+  destroy,
+  state$,
+  systemEvents$,
+} = store;
 ```
 
-### Basic counter
+```tsx
+// Counter.tsx
+import { useStoreValue } from './store';
 
-```
-// counter.tsx
-import { useStoreValue, publish }  from './store';
-
-function Counter() {
+export function Counter() {
   const [count, setCount] = useStoreValue('count');
 
   return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-      <button onClick={() => setCount(count - 1)}>Decrement</button>
-    </div>
-  );
-}
-
-```
-
-### Profile form
-
-```
-import { useStoreValue, publish } from './store';
-
-function ProfileForm() {
-  const [name, setName] = useStoreValue('profile.name');
-  const [city, setCity] = useStoreValue('profile.city');
-
-  return (
-    <form>
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-      <input type="text" value={city} onChange={(e) => setCity(e.target.value)} />
-    </form>
+    <button type="button" onClick={() => setCount(count + 1)}>
+      Count: {count}
+    </button>
   );
 }
 ```
 
-### Hydration at store creation
+At a glance, `createEventStore` maintains a stream of events and derives state from them. Updates are published by property path (for example, `user.name`), and hooks subscribe to those paths.
 
+### How do I update nested fields?
+
+```tsx
+const [name, setName] = useStoreValue('user.name');
+setName('Ada');
+
+// Or outside React:
+publish('user.name', 'Ada');
 ```
-import { createEventStore } from 'dantian';
 
-export const {
-  useStoreValue,
-  useHydrateStore,
-  useIsHydrated,
-  publish,
-  systemEvents$,
-} = createEventStore({
-  // Initial state ...
-}, {
-  hydrator: async () => {
-    // Check if we have saved state in localStorage
-    const storedState = localStorage.getItem('dantianState');
-    if (storedState) {
-      return JSON.parse(storedState);
-    }
+### How do I hydrate from an async source?
 
-    // If no localStorage state, perhaps load defaults or fetch from API:
-    // return await fetch('/api/initial-state').then(res => res.json());
+```ts
+const store = createEventStore(
+  { user: { name: 'n/a' } },
+  {
+    hydrator: async () => {
+      const response = await fetch('/api/profile');
+      return (await response.json()) as { user: { name: string } };
+    },
   },
-  persist: (state) => {
-    try {
+);
+```
+
+### How do I persist state?
+
+```ts
+const store = createEventStore(
+  { count: 0 },
+  {
+    persist: async (state) => {
       localStorage.setItem('dantianState', JSON.stringify(state));
-    } catch (error) {
-      // Handle potential errors during state saving
-      console.error('Failed to persist state', error);
-    }
+    },
+  },
+);
+```
+
+If hydration or persistence fails, you can observe the error via system events
+while console errors remain intact:
+
+```ts
+systemEvents$.subscribe((event) => {
+  if (event.type === '@@HYDRATE_ERROR' || event.type === '@@PERSIST_ERROR') {
+    console.error('store error', event.payload.error);
   }
 });
-
 ```
 
-```
-import { useStoreValue, useIsHydrated } from './store';
+### How do I avoid flicker from concurrent updates?
 
-function App() {
-  const isHydrated = useIsHydrated();
+If updates are coming from multiple sources, you can disable local caching per hook:
 
-  // ... other components
-
-  return (
-    <div>
-      {isHydrated ? (
-        {/* Render your main application content here */}
-      ) : (
-        <div>Loading application state...</div>
-      )}
-    </div>
-  );
-}
+```tsx
+const [value, setValue] = useStoreValue('profile.name', {
+  disableCache: true,
+});
 ```
 
-### Hydration within React
+You can also throttle update propagation with `throttle` (milliseconds):
 
-```
-import { useStoreValue, useHydrateStore, useIsHydrated } from './store';
-import { useEffect } from 'react';
-
-function UserProfile() {
-  const [profile, setProfile] = useStoreValue('profile');
-  const hydrateProfile = useHydrateStore();
-  const isHydrated = useIsHydrated();
-
-  useEffect(() => {
-    if (isHydrated) return;  // Exit if already hydrated
-
-    const loadUserProfile = async () => {
-      try {
-        const fetchedProfile = await fetch('/api/profile').then((res) => res.json());
-        hydrateProfile(fetchedProfile);
-      } catch (error) {
-        console.error('Error fetching profile', error);
-      }
-    };
-
-    loadUserProfile();
-  }, [isHydrated]); // Run useEffect when isHydrated changes
-
-  return (
-    <div>
-      {isHydrated ? (
-        <div>
-          <p>Name: {profile.name}</p>
-          <p>City: {profile.city}</p>
-        </div>
-      ) : (
-        <div className="spinner-container">Loading profile...</div>
-      )}
-    </div>
-  );
-}
-
+```tsx
+const [user] = useStoreValue('user', { throttle: 50 });
 ```
 
-### Hydration and SSR
+### How do I reset or feed state?
 
-SSR offers performance and SEO benefits, but careful state management is crucial. Global singleton-based state libraries can introduce unintended side effects when rendering an application on the server:
-
-- Shared State Across Requests: A single store instance shared across multiple user requests can lead to state contamination, with data from one user potentially bleeding into another's rendered output.
-- Hydration Mismatches: Client-side hydration assumes it begins with the same global state the server rendered. Singleton-based stores can make this challenging.
-
-#### Dantian's Approach
-
-Dantian addresses these challenges through its approach to hydration and event-based state updates:
-
-1. Hydration as Initialization: In Dantian, hydration is a method for initializing store values on the client. Updates are still driven by targeted events, preserving state isolation across user sessions.
-
-2. Request-Specific Stores (If Needed): For SSR frameworks requiring independent stores per request, Dantian can be adapted:
-
-- Create a new store instance within each server-side rendering request.
-- Pass the initial state from this store to the client for hydration.
-
-#### Example Code Snippet (Illustrative)
-
+```ts
+reset({ count: 0, user: { name: 'n/a' } });
+feed({ count: 5, user: { name: 'Julius' } });
 ```
-// Simplified SSR scenario
+
+### How do I subscribe outside React?
+
+```ts
+const subscription = state$.subscribe((state) => {
+  console.log('state changed', state);
+});
+
+subscription.unsubscribe();
+```
+
+### Dispose of a store
+
+If a store is no longer needed, dispose of it to complete internal subjects and
+prevent lingering subscriptions:
+
+```ts
+store.destroy();
+```
+
+After `destroy()`, calls to `publish`, `reset`, `feed`, and the callback from
+`useHydrateStore()` are no-ops.
+
+## Task Guides
+
+### Create a store
+
+```ts
 import { createEventStore } from 'dantian';
 
-function renderAppToString(request) {
-  // 1. Create a fresh store instance for each request
-  const { useStoreValue } = createEventStore({
-    ...requestSpecificInitialState
-  });
-
-  // ... Use useStoreValue within components during SSR ...
-
-  // 3. Extract the store's state for client-side hydration
-  const clientHydrationState = /* Get current store state */;
-
-  return `
-    ... HTML markup ...
-    <script>
-      window.__INITIAL_STATE__ = ${JSON.stringify(clientHydrationState)}
-    </script>
-  `;
-}
-
+const store = createEventStore({ count: 0 }, { debug: false });
 ```
 
-## RxJS
+### Read and update values in components
 
-```
-import { useEffect } from 'react';
-import { state$ } from './store';
+```tsx
+const [count, setCount] = store.useStoreValue('count');
+setCount(count + 1);
 
-function usePersistState(storageKey = 'dantianState') {
-  useEffect(() => {
-    const subscription = state$.subscribe((state) => {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(state));
-      } catch (error) {
-        console.error('Failed to save state', error);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [storageKey]);
-}
-
+// Or publish directly
+store.publish('count', 42);
 ```
 
-### useStoreValue
+`useStoreValue` options:
 
-The `useStoreValue` hook is a fundamental part of the Dantian library, providing a powerful mechanism for accessing and updating state within React components. What sets `useStoreValue` apart is its integration with RxJS, a reactive programming library that enables efficient event handling and state management.
+- `disableCache`: bypasses local caching to avoid flicker in edge cases.
+- `throttle`: throttles updates in milliseconds.
+- `throtle`: legacy alias for `throttle` (kept for backward compatibility).
 
-### Leveraging RxJS Observables
+### Hydrate and persist
 
-At its core, the `useStoreValue` hook utilizes RxJS observables to subscribe to changes in the underlying state. When you initially access a property using `useStoreValue`, it creates a subscription to the `state$` observable, which represents the current state of the application.
-
-```javascript
-const [count, setCount] = useStoreValue('count');
-```
-
-This initial subscription ensures that your component receives the latest value of the specified property and automatically updates whenever the state changes.
-
-#### Event-Based Updates
-
-In addition to the initial subscription to the state observable, useStoreValue also subscribes to the global event bus (globalEventStore$). This event bus emits events whenever state updates occur, allowing components to react to specific changes efficiently.
-
-```
-useEffect(() => {
-  const subscription = getPropertyObservable(type).subscribe({
-    next: (value) => {
-      setValue(value);
+```ts
+const store = createEventStore(
+  { count: 0 },
+  {
+    hydrator: async () => ({ count: 10 }),
+    persist: async (state) => {
+      localStorage.setItem('dantianState', JSON.stringify(state));
     },
-  });
-  return () => {
-    subscription.unsubscribe();
-  };
-}, []);
-
+  },
+);
 ```
 
-By combining the initial value subscription with event-based updates, useStoreValue achieves a balance between performance and flexibility. Components receive immediate updates from the local state, ensuring smooth user interactions, while also staying in sync with the global event store to handle changes from other parts of the application.
+In React, you can trigger hydration manually:
 
-#### Caching
-
-The `useStoreValue` hook offers control over local state caching, allowing you to fine-tune component updates for optimal performance.
-
-```
-import { useStoreValue } from './store';
-
-// Access a property with default caching behavior
-const [count, setCount] = useStoreValue('count');
-
-// Access a property and disable caching
-const [profileName, setProfileName] = useStoreValue('profile.name', { disableCache: true });
-
-// Access a property and set frequency of updates
-const [profileEmail, setProfileEmail] = useStoreValue('profile.email', { throttle: 100 });
-
+```tsx
+const hydrate = store.useHydrateStore();
+const isHydrated = store.useIsHydrated();
 ```
 
-By default, useStoreValue maintains local state, ensuring immediate updates without waiting for a roundtrip through the global store. When the store is updated, the value is propagated back to the hook, synchronizing the local state.
+### Reset and feed
 
-This approach is generally effective and particularly powerful with controlled inputs, where there's no discernible difference from having a useState next to the input field. However, in certain edge cases where there are high-frequency updates originating from multiple sources, visual glitches may occur.
+```ts
+store.reset({ count: 0 });
+store.feed({ count: 5 });
+```
 
-Imagine two events being fired almost simultaneously with different values. Although this scenario is typically indicative of a code smell, the result may be that the user sees one value immediately overwritten by another value. In such cases, disabling the local cache will yield a smoother outcome.
+### Destroy
+
+```ts
+store.destroy();
+```
+
+### Observe with RxJS
+
+```ts
+const sub = store.getPropertyObservable('count').subscribe((value) => {
+  console.log('count changed', value);
+});
+
+sub.unsubscribe();
+```
+
+### Classic store basics
+
+If you need a minimal store with selectors and updates, use `buildClassicStore`:
+
+```ts
+import { buildClassicStore } from 'dantian';
+
+const classic = await buildClassicStore({ count: 0 });
+const [state, update] = classic.useStore();
+const count = classic.useSelector((s) => s.count);
+update((prev) => ({ ...prev, count: prev.count + 1 }));
+```
+
+With hydration and persistence:
+
+```ts
+const classic = await buildClassicStore({
+  beforeLoadState: { count: 0 },
+  hydrator: async () => ({ count: 2 }),
+  persist: async (state) => {
+    localStorage.setItem('classicState', JSON.stringify(state));
+  },
+});
+```
+
+## API Reference
+
+### `createEventStore<T extends object>(initialState, options?)`
+
+Options:
+
+- `debug?: boolean` — log events and state transitions.
+- `hydrator?: () => Promise<T>` — async hydration source.
+- `persist?: (state: T) => Promise<void>` — persistence callback.
+
+Returns:
+
+- `useStoreValue<K>(path, options?)`: React hook for reading/updating a property path.
+- `publish(path, payload)`: publish an event for a property path.
+- `getPropertyObservable(path, throttle?)`: RxJS observable for a property path.
+- `useHydrateStore()`: returns a function to emit `@@HYDRATED` with payload.
+- `useIsHydrated()`: returns a boolean hydration flag.
+- `reset(payload)`: emit `@@RESET` system event.
+- `feed(payload)`: emit `@@FEED` system event.
+- `state$`: `BehaviorSubject<T>` with current state.
+- `globalEventStore$`: `BehaviorSubject` of all events.
+- `systemEvents$`: observable of system events (event types starting with `@@`,
+  including `@@HYDRATE_ERROR` and `@@PERSIST_ERROR`).
+- `destroy()`: dispose the store, completing internal subjects and stopping
+  further publishes.
+
+`useStoreValue` options:
+
+- `disableCache?: boolean`
+- `throttle?: number`
+- `throtle?: number` (legacy alias)
+
+### `buildClassicStore<T>(defaultState)`
+
+`defaultState` can be either a plain initial state or an object with:
+
+- `beforeLoadState: T`
+- `hydrator: () => Promise<T>`
+- `persist?: (state: T) => Promise<void>`
+
+Returns:
+
+- `useStore()`: React hook for `[state, update]`.
+- `useSelector(selector)`: React hook for derived values.
+- `update(updater)`: update function.
+- `getValue()`: current value getter.
+- `subject$`: `BehaviorSubject<T>`.
+- `defaultState`: the provided default state.
+
+### `wuji`
+
+Alias of `createEventStore`.
+
+## Troubleshooting
+
+- Hydration errors: `systemEvents$` emits `@@HYDRATE_ERROR` and the console logs
+  `Failed to hydrate store`. Verify the hydrator resolves with the same shape
+  as the initial state and handle thrown errors.
+- Persist errors: `systemEvents$` emits `@@PERSIST_ERROR` and the console logs
+  `Failed to persist store`. Ensure your persist callback returns a promise and
+  handles storage quotas or serialization failures.
+- Disposed stores still referenced: call `destroy()` when a store is no longer
+  used, and avoid calling `publish/reset/feed` afterward.
+
+## 1.0 Migration Notes
+
+- No breaking changes are required.
+- `destroy()` is now available to explicitly dispose of stores.
+- `systemEvents$` now includes `@@HYDRATE_ERROR` and `@@PERSIST_ERROR` events.
 
 ## License
 
 MIT
-
-## API Overview
-
-- `createEventStore<T extends object>(initialState: T, options?: {...})`
-
-  - Creates a new Dantian event store.
-  - Parameters:
-    - `initialState`: The initial state object of your store.
-    - `options`: An optional object containing configuration settings:
-      - `debug`: Enables debug logging (default: `false`).
-      - `hydrator`: An asynchronous function returning a promise resolving to the hydration data.
-      - `persist`: An asynchronous function to handle state persistence.
-
-- `publish<TType extends PropertyPath<T>, TPayload extends GetValueType<T, TType>>(type: TType, payload: TPayload)`
-
-  - Publishes an event to update the store.
-  - Parameters:
-    - `type`: The property path within the store to be updated (e.g., 'count', 'profile.name').
-    - `payload`: The new value for the specified property.
-
-- `getPropertyObservable<K extends PropertyPath<T>>(eventType: K, throttle?: number)`
-
-  - Returns an RxJS Observable that emits values whenever the specified property in the store is updated.
-
-- `getHydrationObservable$()`
-
-  - Returns an RxJS Observable that emits values when the store is hydrated.
-
-- `state$`
-
-  - An RxJS BehaviorSubject that holds the current state of the store.
-
-- `useStoreValue<K extends PropertyPath<T>>(type: K, options?: {...})`
-
-  - React hook to access and update a specific property within the store.
-  - Parameters:
-    - `type`: The property path within the store.
-    - `options.disableCache`: boolean property to control local caching behavior.
-    - `options.throtle`: numeric property to control frequency of updates in ms.
-  - Returns: An array containing:
-    - The current value of the property.
-    - A function to update the property.
-
-- `useHydrateStore()`
-
-  - React hook to trigger store hydration.
-  - Returns: A function to initialize the store with hydrated data.
-
-- `useIsHydrated()`
-
-  - React hook to determine if the store is hydrated.
-  - Returns: A boolean indicating hydration status.
-
-- `systemEvents$`
-
-  - An RxJS Observable that emits Dantian system events (e.g., '@@INIT', '@@HYDRATED').

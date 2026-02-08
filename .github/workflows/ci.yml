@@ -12,24 +12,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Configure Git
         run: |
           git config --global user.name "JuliusKoronciCH"
           git config --global user.email "julius.koronci@gmail.com"
-      - uses: actions/checkout@v3
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
 
-      - name: Install Dependencies
+      - name: Enable Corepack
         run: corepack enable
-        if: ${{ !steps.cache.outputs.cache-hit }}
 
       - name: Cache Dependencies (Yarn Berry)
-        uses: actions/cache@v3
+        id: yarn-cache
+        uses: actions/cache@v4
         with:
           path: ~/.yarn/cache # Cache location for Yarn Berry
           key: ${{ runner.os }}-yarn-berry-${{ hashFiles('**/yarn.lock') }}
@@ -45,22 +44,38 @@ jobs:
       - name: Run Linters
         run: yarn lint
 
-      - name: Run Prettier
-        run: yarn format
+      - name: Run Prettier Check
+        run: yarn format:check
+
+      - name: Run Typecheck
+        run: yarn typecheck
 
       - name: Run Tests
         run: yarn test
 
+      - name: Run Coverage
+        run: yarn test:coverage
+
       - name: Run Build
         run: yarn build
 
-      - name: Start Storybook
-        run: yarn storybook &
+      - name: Build Storybook
+        run: yarn build-storybook
+
+      - name: Run Storybook Tests
+        run: yarn test-storybook:ci
 
       - name: Run Playwright tests
-        run: yarn playwright test
+        run: yarn e2e
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
@@ -73,7 +88,7 @@ jobs:
           ls -lah 
           yarn standard-version
           git push origin main --follow-tags
-          npm publish
+          yarn npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.CHANGELOG_TOKEN }}

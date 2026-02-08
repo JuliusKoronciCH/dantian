@@ -1,0 +1,30 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true
+  },
+  "include": [
+    "lib/**/*.ts",
+    "lib/**/*.tsx",
+    "e2e/**/*.ts",
+    "e2e/**/*.tsx",
+    "*.config.ts",
+    "*.config.js",
+    "eslint.config.js",
+    "commitlint.config.js",
+    "vite.config.js",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "playwright.config.ts",
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "storybook-static",
+    "playwright-report",
+    "test-results",
+    "coverage"
+  ]
+}

@@ -1,0 +1,14 @@
+.ag-theme-trade-blotter {
+  --ag-font-size: 12px;
+  --ag-row-height: 32px;
+  --ag-header-height: 36px;
+  --ag-row-hover-color: rgba(148, 163, 184, 0.16);
+  --ag-value-change-value-highlight-background-color: rgba(250, 204, 21, 0.55);
+  --ag-value-change-delta-up-color: #38bdf8;
+  --ag-value-change-delta-down-color: #fb7185;
+  --ag-border-color: #1f2937;
+}
+
+.ag-theme-trade-blotter .ag-row {
+  transition: background-color 120ms ease;
+}

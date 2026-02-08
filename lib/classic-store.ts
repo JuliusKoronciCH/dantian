@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { useMemo, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
 type UpdateFunction<T> = (state: T) => T;
 type Updater<T> = (cb: UpdateFunction<T>) => void;
@@ -7,22 +7,22 @@ type Updater<T> = (cb: UpdateFunction<T>) => void;
 type DefaultState<T> =
   | T
   | {
-    hydrator: () => Promise<T>
-    beforeLoadState: T
-    persist?: (state: T) => Promise<void>
-  };
+      hydrator: () => Promise<T>;
+      beforeLoadState: T;
+      persist?: (state: T) => Promise<void>;
+    };
 
 interface StoreBuilder<T> {
-  defaultState: DefaultState<T>
-  useStore: () => [T, Updater<T>]
-  useSelector: <S>(selector: (state: T) => S) => S
-  subject$: BehaviorSubject<T>
-  update: Updater<T>
-  getValue: () => T
+  defaultState: DefaultState<T>;
+  useStore: () => [T, Updater<T>];
+  useSelector: <S>(selector: (state: T) => S) => S;
+  subject$: BehaviorSubject<T>;
+  update: Updater<T>;
+  getValue: () => T;
 }
 
 const isDefaultState = <T>(
-  defaultState: DefaultState<T>
+  defaultState: DefaultState<T>,
 ): defaultState is T => {
   if (
     typeof defaultState === 'object' &&
@@ -35,23 +35,35 @@ const isDefaultState = <T>(
 };
 
 export const buildClassicStore = async <T>(
-  defaultState: DefaultState<T>
+  defaultState: DefaultState<T>,
 ): Promise<StoreBuilder<T>> => {
   const initialState = isDefaultState<T>(defaultState)
     ? defaultState
-    : await defaultState.hydrator();
+    : defaultState.beforeLoadState;
 
   const store = new BehaviorSubject<T>(initialState);
+  const persist = isDefaultState<T>(defaultState)
+    ? undefined
+    : defaultState.persist;
+
+  const persistState = (state: T) => {
+    if (!persist) return;
+    Promise.resolve(persist(state)).catch((error) => {
+      console.error('Failed to persist store', error);
+    });
+  };
 
   const update: Updater<T> = (updater) => {
-    store.next(updater(store.getValue()));
+    const nextState = updater(store.getValue());
+    store.next(nextState);
+    persistState(nextState);
   };
 
   const useStore = () => {
     const subscribe = (onStoreChange: () => void) => {
       const subscription = store.subscribe({
         next: onStoreChange,
-        error: console.error
+        error: console.error,
       });
 
       return () => {
@@ -61,19 +73,46 @@ export const buildClassicStore = async <T>(
     const state: T = useSyncExternalStore(
       subscribe,
       () => store.getValue(),
-      () => initialState
+      () => initialState,
     );
 
     return [state, update] satisfies [T, Updater<T>];
   };
 
   const useSelector = <S>(selector: (state: T) => S) => {
-    const [value] = useStore();
+    const getSnapshot = () => selector(store.getValue());
+    const subscribe = (onStoreChange: () => void) => {
+      let lastSelected = getSnapshot();
+      const subscription = store.subscribe({
+        next: (state) => {
+          const nextSelected = selector(state);
+          if (!Object.is(lastSelected, nextSelected)) {
+            lastSelected = nextSelected;
+            onStoreChange();
+          }
+        },
+        error: console.error,
+      });
 
-    const selectedValue = selector(value);
+      return () => {
+        subscription.unsubscribe();
+      };
+    };
 
-    return useMemo(() => selectedValue, [selectedValue]);
+    return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   };
+
+  if (!isDefaultState<T>(defaultState)) {
+    defaultState
+      .hydrator()
+      .then((hydratedState) => {
+        store.next(hydratedState);
+        persistState(hydratedState);
+      })
+      .catch((error) => {
+        console.error('Failed to hydrate store', error);
+      });
+  }
 
   return {
     defaultState,
@@ -81,6 +120,6 @@ export const buildClassicStore = async <T>(
     useSelector,
     subject$: store,
     update,
-    getValue: () => store.getValue()
+    getValue: () => store.getValue(),
   };
 };

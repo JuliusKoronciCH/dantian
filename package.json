@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/JuliusKoronciCH/dantian#readme",
   "license": "MIT",
-  "version": "0.0.2-beta.18",
+  "version": "0.0.2-beta.19",
   "type": "module",
   "main": "./dist/dantian.cjs",
   "module": "./dist/dantian.js",

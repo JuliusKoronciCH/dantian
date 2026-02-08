@@ -2,16 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## Unreleased
-
-### Highlights
-
-- Tooling upgrades across TypeScript, Vite, Vitest, Playwright, Storybook, ESLint, and Prettier.
-- Packaging improvements including `exports` map, `sideEffects` flag, and build declaration configuration.
-- Event store fixes and enhancements: `throttle` option, proper audit timing, reset/feed helpers, and persist error handling.
-- Classic store enhancements: `beforeLoadState`, persist wiring, and selector re-render optimizations.
-- Expanded tests (unit, RTL, Storybook test runner) and CI hardening.
-- Documentation refresh with updated README, CONTRIBUTING guide, and release checklist.
+### 0.0.2-beta.19 (2026-02-08)
 
 ### 0.0.2-beta.18 (2024-05-21)
 
